@@ -21,19 +21,44 @@ GRAY="\e[0;37m"
 BOLD_GRAY="\e[1;30m"
 # END OF TERMINAL COLORS
 
+# Global variable to track if attack is running
+ATTACK_RUNNING=0
+
 function coolexit() {
+    ATTACK_RUNNING=0
+    sleep 2  # Give time for background processes to stop
     clear
     ifconfig "$AD" down > /dev/null 2>&1
     macchanger -p "$AD" > /dev/null 2>&1
     iwconfig "$AD" mode managed > /dev/null 2>&1
     ifconfig "$AD" up > /dev/null 2>&1
     rm RANDOM_wordlist.txt > /dev/null 2>&1
+    killall mdk3 > /dev/null 2>&1  # Kill any remaining mdk3 processes
     nmcli device connect "$AD" > /dev/null 2>&1
     clear
     title
     echo -e "$BOLD_RED   Thank you for using this script."
     echo -e "   Visit my GitHub at: $BOLD_WHITE https://github.com/125K"
     exit
+}
+
+function start_beacon_flood_enhanced() {
+    local wordlist_file="$1"
+    local ssid_count="$2"
+    
+    ATTACK_RUNNING=1
+    
+    echo -e "$BOLD_CYAN   Using enhanced beacon flood with:"
+    echo -e "$BOLD_WHITE   - Random source MAC for each packet (-m)"
+    echo -e "$BOLD_WHITE   - Random BSSID for each beacon (-g)" 
+    echo -e "$BOLD_WHITE   - Your laptop MAC already randomized for anonymity"
+    echo " "
+    
+    # Start enhanced mdk3 with built-in randomization
+    # -m flag uses random source MAC for each packet  
+    # -g uses random BSSID for each beacon
+    # -a sends beacons to all channels
+    mdk3 "$AD" b -f "$wordlist_file" -a -m -g -s "$ssid_count"
 }
 
 function title() {
@@ -74,17 +99,20 @@ case $DD in
         nmcli device disconnect "$AD" > /dev/null 2>&1
         clear
         title
-        echo -e "$BOLD_GREEN Initiating process..."
+        echo -e "$BOLD_GREEN Initiating process with MAC randomization..."
         echo " Press CTRL+C to stop at any time."
         echo " "
         trap coolexit EXIT
+        echo -e "$BOLD_GREEN Randomizing your laptop's MAC address for anonymity..."
+        echo -e "$BOLD_CYAN Original MAC address hidden for privacy"
         sleep 1
         ifconfig "$AD" down
         macchanger -r "$AD"
+        echo -e "$BOLD_GREEN Setting up monitor mode..."
         iwconfig "$AD" mode monitor
         ifconfig "$AD" up
         trap coolexit EXIT
-        mdk3 "$AD" b -f ./SSID_List.txt -a -s 1000
+        start_beacon_flood_enhanced "./SSID_List.txt" 1000
         ;;
     2)
         nmcli device disconnect "$AD" > /dev/null 2>&1
@@ -103,17 +131,20 @@ case $DD in
         done
         clear
         title
-        echo -e "$BOLD_GREEN Initiating process..."
+        echo -e "$BOLD_GREEN Initiating process with MAC randomization..."
         echo " Press CTRL+C to stop at any time."
         echo " "
         trap coolexit EXIT
+        echo -e "$BOLD_GREEN Randomizing your laptop's MAC address for anonymity..."
+        echo -e "$BOLD_CYAN Original MAC address hidden for privacy"
         sleep 1
         ifconfig "$AD" down
         macchanger -r "$AD"
+        echo -e "$BOLD_GREEN Setting up monitor mode..."
         iwconfig "$AD" mode monitor
         ifconfig "$AD" up
         trap coolexit EXIT
-        mdk3 "$AD" b -f ./"$WORD"_wordlist.txt -a -s 1000
+        start_beacon_flood_enhanced "./"$WORD"_wordlist.txt" 1000
         ;;
     3)
         nmcli device disconnect "$AD" > /dev/null 2>&1
@@ -127,16 +158,19 @@ case $DD in
         read -r OWN
         clear
         title
-        echo -e "$BOLD_GREEN Initiating process..."
+        echo -e "$BOLD_GREEN Initiating process with MAC randomization..."
         echo " Press CTRL+C to stop at any time."
         echo -e "$BOLD_WHITE"
+        echo -e "$BOLD_GREEN Randomizing your laptop's MAC address for anonymity..."
+        echo -e "$BOLD_CYAN Original MAC address hidden for privacy"
         sleep 1
         ifconfig "$AD" down
         macchanger -r "$AD"
+        echo -e "$BOLD_GREEN Setting up monitor mode..."
         iwconfig "$AD" mode monitor
         ifconfig "$AD" up
         trap coolexit EXIT
-        mdk3 "$AD" b -f ./"$OWN" -a -s "$(wc -l < "$OWN")"
+        start_beacon_flood_enhanced "./"$OWN"" "$(wc -l < "$OWN")"
         ;;
     4)
         nmcli device disconnect "$AD" > /dev/null 2>&1
@@ -152,16 +186,19 @@ case $DD in
         done
         clear
         title
-        echo -e "$BOLD_GREEN Initiating process..."
+        echo -e "$BOLD_GREEN Initiating process with MAC randomization..."
         echo " Press CTRL+C to stop at any time."
         echo " "
+        echo -e "$BOLD_GREEN Randomizing your laptop's MAC address for anonymity..."
+        echo -e "$BOLD_CYAN Original MAC address hidden for privacy"
         sleep 1
         ifconfig "$AD" down
         macchanger -r "$AD"
+        echo -e "$BOLD_GREEN Setting up monitor mode..."
         iwconfig "$AD" mode monitor
         ifconfig "$AD" up
         trap coolexit EXIT
-        mdk3 "$AD" b -f ./RANDOM_wordlist.txt -a -s "$N"
+        start_beacon_flood_enhanced "./RANDOM_wordlist.txt" "$N"
         ;;
     *)
         echo -e "$BOLD_RED Invalid option! Exiting..."
