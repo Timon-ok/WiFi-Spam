@@ -74,7 +74,8 @@ case $DD in
         nmcli device disconnect "$AD" > /dev/null 2>&1
         clear
         title
-        echo -e "$BOLD_GREEN Initiating process..."
+        echo -e "$BOLD_GREEN Initiating enhanced process for better compatibility..."
+        echo -e "$BOLD_CYAN Optimized for Android/Windows detection"
         echo " Press CTRL+C to stop at any time."
         echo " "
         trap coolexit EXIT
@@ -84,7 +85,8 @@ case $DD in
         iwconfig "$AD" mode monitor
         ifconfig "$AD" up
         trap coolexit EXIT
-        mdk3 "$AD" b -f ./SSID_List.txt -a -s 1000
+        # Slower rate + WEP encryption + channel hopping for better detection
+        mdk3 "$AD" b -f ./SSID_List.txt -a -w -h -s 50
         ;;
     2)
         nmcli device disconnect "$AD" > /dev/null 2>&1
@@ -103,7 +105,8 @@ case $DD in
         done
         clear
         title
-        echo -e "$BOLD_GREEN Initiating process..."
+        echo -e "$BOLD_GREEN Initiating enhanced process..."
+        echo -e "$BOLD_CYAN Using optimized settings for better detection"
         echo " Press CTRL+C to stop at any time."
         echo " "
         trap coolexit EXIT
@@ -113,7 +116,7 @@ case $DD in
         iwconfig "$AD" mode monitor
         ifconfig "$AD" up
         trap coolexit EXIT
-        mdk3 "$AD" b -f ./"$WORD"_wordlist.txt -a -s 1000
+        mdk3 "$AD" b -f ./"$WORD"_wordlist.txt -a -w -h -s 50
         ;;
     3)
         nmcli device disconnect "$AD" > /dev/null 2>&1
@@ -127,7 +130,8 @@ case $DD in
         read -r OWN
         clear
         title
-        echo -e "$BOLD_GREEN Initiating process..."
+        echo -e "$BOLD_GREEN Initiating enhanced process..."
+        echo -e "$BOLD_CYAN Optimized rate and encryption for better detection"
         echo " Press CTRL+C to stop at any time."
         echo -e "$BOLD_WHITE"
         sleep 1
@@ -136,7 +140,7 @@ case $DD in
         iwconfig "$AD" mode monitor
         ifconfig "$AD" up
         trap coolexit EXIT
-        mdk3 "$AD" b -f ./"$OWN" -a -s "$(wc -l < "$OWN")"
+        mdk3 "$AD" b -f ./"$OWN" -a -w -h -s 50
         ;;
     4)
         nmcli device disconnect "$AD" > /dev/null 2>&1
@@ -152,7 +156,8 @@ case $DD in
         done
         clear
         title
-        echo -e "$BOLD_GREEN Initiating process..."
+        echo -e "$BOLD_GREEN Initiating enhanced process..."
+        echo -e "$BOLD_CYAN Optimized for better cross-platform detection"
         echo " Press CTRL+C to stop at any time."
         echo " "
         sleep 1
@@ -161,7 +166,7 @@ case $DD in
         iwconfig "$AD" mode monitor
         ifconfig "$AD" up
         trap coolexit EXIT
-        mdk3 "$AD" b -f ./RANDOM_wordlist.txt -a -s "$N"
+        mdk3 "$AD" b -f ./RANDOM_wordlist.txt -a -w -h -s 50
         ;;
     *)
         echo -e "$BOLD_RED Invalid option! Exiting..."
